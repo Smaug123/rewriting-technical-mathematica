@@ -1,0 +1,38 @@
+MakeExpression[
+  RowBox[{"(", x_RowBox?(FreeQ[List @@ #, RowBox] &), ")"}], form_] :=
+  MakeExpression[RowBox[Join[{"{"}, Sequence @@ x, {"}"}]], form]
+
+MakeExpression[RowBox[{"(", x_RowBox, ")"}], form_] :=
+ MakeExpression[x, form]
+
+MakeExpression[RowBox[{x__, "%", y__}], form_] :=
+ MakeExpression[RowBox[{"Mod", "[", RowBox[{x, ",", y}], "]"}], form]
+
+MakeExpression[RowBox[{"println", RowBox[{"(", xs___, ")"}]}],
+  form_] := MakeExpression[RowBox[{"Print", "[", xs, "]"}], form]
+
+MakeExpression[
+  RowBox[{"if", RowBox[{"(", xs__, ")"}], RowBox[{"{", zs___, "}"}]}],
+   form_] :=
+ MakeExpression[RowBox[{"If", "[", xs, ",", zs, "]"}], form]
+
+MakeExpression[
+  RowBox[{"if", RowBox[{"(", xs__, ")"}], RowBox[{"{", zs___, "}"}],
+    "else", ys___}], form_] :=
+ If[ReleaseHold@MakeExpression[xs, form], MakeExpression[zs, form],
+  MakeExpression[RowBox[{ys}], form]]
+
+MakeExpression[
+  RowBox[{"for",
+    RowBox[{"(", RowBox[{init__, ";", cond__, ";", incr__}], ")"}],
+    RowBox[{"{", expr__, "}"}]}], form_] :=
+ For[ReleaseHold@MakeExpression[init, form],
+  ReleaseHold@MakeExpression[cond, form],
+  ReleaseHold@MakeExpression[incr, form],
+  ReleaseHold@MakeExpression[expr, form]]
+
+
+  for (i = 1 ; i < 101 ;
+  i++) {if (i % 15 == 0) {println ("FizzBuzz");} else if (i % 3 ==
+      0) {println ("Fizz");} else if (i % 5 ==
+      0) {println ("Buzz");} else {println (i);};}
